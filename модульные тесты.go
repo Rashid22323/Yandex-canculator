@@ -47,7 +47,7 @@ func TestLoginHandler(t *testing.T) {
 }
 
 func TestAddExpressionHandler(t *testing.T) {
-	// Create a mock client for gRPC CalculatorClient
+	
 	type mockClient struct {
 		pb.UnimplementedCalculatorServer
 	}
@@ -56,7 +56,7 @@ func TestAddExpressionHandler(t *testing.T) {
 		return &pb.Result{Value: 3}, nil
 	}
 
-	// Replace the global client with the mock client
+	
 	client = &mockClient{}
 
 	req, _ := http.NewRequest(http.MethodGet, "/add?expression=1+2", nil)
@@ -66,14 +66,14 @@ func TestAddExpressionHandler(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rr.Code)
 	assert.Equal(t, "1", rr.Body.String())
 
-	// Restore the original client
+	
 	conn, err := grpc.Dial(":8081", grpc.WithInsecure())
 	assert.NoError(t, err)
 	client = pb.NewCalculatorClient(conn)
 }
 
 func TestGetExpressionHandler(t *testing.T) {
-	// Add an expression to the database
+	
 	id := fmt.Sprintf("%d", time.Now().UnixNano())
 	err := saveExpression(id, "1+2", "waiting", 0)
 	assert.NoError(t, err)
@@ -94,7 +94,7 @@ func TestGetExpressionHandler(t *testing.T) {
 }
 
 func TestListExpressionsHandler(t *testing.T) {
-	// Add an expression to the database
+	
 	id := fmt.Sprintf("%d", time.Now().UnixNano())
 	err := saveExpression(id, "1+2", "waiting", 0)
 	assert.NoError(t, err)
@@ -129,7 +129,7 @@ func TestListOperationsHandler(t *testing.T) {
 }
 
 func TestGetTaskHandler(t *testing.T) {
-	// Add a task to the tasks map
+	
 	id := fmt.Sprintf("%d", time.Now().UnixNano())
 	task := &Task{
 		ID:      id,
@@ -158,7 +158,7 @@ func TestGetTaskHandler(t *testing.T) {
 }
 
 func TestReceiveResultHandler(t *testing.T) {
-	// Add a task to the tasks map
+	
 	id := fmt.Sprintf("%d", time.Now().UnixNano())
 	task := &Task{
 		ID:      id,
@@ -180,7 +180,7 @@ func TestReceiveResultHandler(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, rr.Code)
 
-	// Check if the task is updated in the tasks map
+	
 	mu.RLock()
 	updatedTask, ok := tasks[id]
 	mu.RUnlock()
@@ -188,7 +188,7 @@ func TestReceiveResultHandler(t *testing.T) {
 	assert.Equal(t, float64(3), updatedTask.Result)
 	assert.True(t, updatedTask.IsReady)
 
-	// Check if the expression is updated in the database
+	
 	expression, err := getExpressionFromDB(id)
 	assert.NoError(t, err)
 	assert.Equal(t, "1+2", expression.Expression)
@@ -197,12 +197,12 @@ func TestReceiveResultHandler(t *testing.T) {
 }
 
 func TestSaveExpression(t *testing.T) {
-	// Test saving an expression to the database
+	
 	id := fmt.Sprintf("%d", time.Now().UnixNano())
 	err := saveExpression(id, "1+2", "waiting", 0)
 	assert.NoError(t, err)
 
-	// Check if the expression is saved in the database
+	
 	expression, err := getExpressionFromDB(id)
 	assert.NoError(t, err)
 	assert.Equal(t, id, expression.ID)
@@ -212,16 +212,16 @@ func TestSaveExpression(t *testing.T) {
 }
 
 func TestUpdateExpressionResult(t *testing.T) {
-	// Add an expression to the database
+	
 	id := fmt.Sprintf("%d", time.Now().UnixNano())
 	err := saveExpression(id, "1+2", "waiting", 0)
 	assert.NoError(t, err)
 
-	// Update the expression result in the database
+	
 	err = updateExpressionResult(id, 3, "completed")
 	assert.NoError(t, err)
 
-	// Check if the expression is updated in the database
+	
 	expression, err := getExpressionFromDB(id)
 	assert.NoError(t, err)
 	assert.Equal(t, id, expression.ID)
@@ -235,7 +235,7 @@ func TestHashPassword(t *testing.T) {
 	hashedPassword := hashPassword(password)
 	assert.NotEmpty(t, hashedPassword)
 
-	// Hash the password again and check if it's the same
+	
 	hashedPassword2 := hashPassword(password)
 	assert.Equal(t, hashedPassword, hashedPassword2)
 }
@@ -253,7 +253,7 @@ func TestGenerateJWT(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEmpty(t, signedToken)
 
-	// Parse the token and check if the claims are correct
+	
 	parsedToken, err := jwt.ParseWithClaims(signedToken, claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey, nil
 	})
